@@ -23,7 +23,7 @@ os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_F
 # Params
 setting = 'Read'
 acc_path = 'data/processed/Corsini2021/acc'
-n_accensione = 2
+n_accensione = 1
 #
 poi=[
     [1, 1, 1, 1],
@@ -31,7 +31,7 @@ poi=[
     ]
 #
 if setting == 'Read':
-    acc = acc_path + '/Corsini2021_Acc' + str(n_accensione + 1).zfill(2) + '.csv'
+    acc = acc_path + '/Corsini2021_Acc' + str(n_accensione).zfill(2) + '.csv'
     data = pd.read_csv(acc)
     data['PwrTOT_rel'].plot()
     plt.show()

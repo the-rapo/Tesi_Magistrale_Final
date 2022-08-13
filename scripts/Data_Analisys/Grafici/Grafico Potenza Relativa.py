@@ -3,8 +3,9 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 # Custom LIBs
-from cust_libs.data_processing import filter_data
+from cust_libs.data_processing import filter_data, transf_fun
 
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 
@@ -13,8 +14,10 @@ data_path_ON = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
 # - DATI
 low_P = 0.60
 high_P = 0.75
+# mpl.rcParams["font.size"] = 22
 
 data_ON = pd.read_csv(data_path_ON)
+rel2tot, tot2rel = transf_fun(data_ON)
 
 rel_pwr = data_ON['PwrTOT_rel'].values
 LowP_data = filter_data(data_ON, None, None, 0, low_P)
@@ -57,7 +60,8 @@ ax0.text(low_P, locs_y[-1] * 0.8, 'Soglia \n Bassa Potenza', ha='center', va='ce
          backgroundcolor='white', color='k')
 ax0.text(high_P, locs_y[-1] * 0.8, 'Soglia \n Alta Potenza', ha='center', va='center', rotation='vertical',
          backgroundcolor='white', color='k')
-
+secax_x = ax0.secondary_xaxis('top', functions=(rel2tot, tot2rel))
+secax_x.set_xlabel(r'$Potenza\ [MW]$')
 # - TORTA (ax1)
 pie_labels = ["Bassa Potenza \n "  "{:.1f}".format(low_perc) + '%',
               "Media Potenza \n "  "{:.1f}".format(100 - high_perc - low_perc) + '%',
@@ -82,3 +86,5 @@ for i, p in enumerate(wedges):
                  horizontalalignment='center', **kw, fontsize=11)
 
 plt.show()
+
+plt.savefig("temp/pot_rel_hist.png", bbox_inches='tight')

@@ -26,3 +26,4 @@ rendimento_max = max(data_ON['Rendimento'].values)
 data_ON['Rendimento'].describe()
 data_ON['PwrTOT_rel'].describe()
 data_ON['Grad_PwrTOT_rel'].describe() * 100
+

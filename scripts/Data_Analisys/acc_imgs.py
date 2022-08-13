@@ -1,6 +1,6 @@
 """
 ##### ACC IMG GEN V2 #####
-Questo script procede alla creazione di grafici descrittive per le singole accensioni.
+Questo script procede alla creazione di grafici descrittivi per le singole accensioni.
 Le immagini vengono salvate nella cartella acc/img.
 I files hanno nome xxx_ACC_XX_descr.png
 """

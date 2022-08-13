@@ -87,3 +87,5 @@ for i, p in enumerate(wedges):
                  horizontalalignment='center', **kw, fontsize=11)
 
 plt.show()
+
+plt.savefig("temp/rendimento_hist.png", bbox_inches='tight')
