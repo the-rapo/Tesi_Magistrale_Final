@@ -9,11 +9,11 @@ from scipy import stats
 from numpy.polynomial import Polynomial
 
 # Custom LIBs
-from cust_libs.data_processing import filter_data, transf_fun
+from cust_libs.misc import transf_fun
 
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #
-data_accensione = 'data/processed/Corsini2021/acc/Corsini2021_Acc10.csv'
+data_accensione = 'data/processed/Corsini2021/acc/Corsini2021_Acc01.csv'
 
 data = pd.read_csv(data_accensione)
 mpl.rcParams["font.size"] = 18
@@ -29,10 +29,10 @@ avg_pwr = np.average(pwr_rel)
 
 fig, ax = plt.subplots(figsize=(18, 9))
 
-ax.plot(x, pwr_rel, linewidth=2, color='b')
+ax.plot(x, pwr_rel, linewidth=2, color='k', label='Potenza Totale')
 
 ax2 = ax.twinx()
-ax2.plot(x, terna_load, color='g', linewidth=2, alpha=0.5)
+ax2.plot(x, terna_load, color='b', linewidth=2, alpha=1, label='Domanda di Rete', linestyle='dotted')
 
 ax.set_xlim([0, len(data)])
 ax.set_ylim([0, 0.9*410])
@@ -40,9 +40,8 @@ locs_y2 = ax2.get_yticks()
 ax2.set_yticks(locs_y2, np.round(locs_y2 / 1000, 1))
 ax.set_ylabel('Potenza [MW]')
 ax.set_xlabel('Tempo [min]')
-ax2.set_ylabel('Domanda di Rete [GW]')
+ax2.set_ylabel('Domanda di Rete [GW]', color='b')
 
-plt.legend()
 res = stats.pearsonr(pwr_rel, terna_load)
 print(res)
 # plt.savefig("temp/esempio_terna_02" + ".png", bbox_inches='tight')

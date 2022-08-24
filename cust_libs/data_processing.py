@@ -323,33 +323,6 @@ def filter_data(data: DataFrame, grad_inf, grad_sup, rel_pw_inf, rel_pw_sup):
     return data_filt_2
 
 
-def transf_fun(par) -> any:
-    """
-    Definisce le funzioni di trasferimento tra potenza e potenza relativa
-
-    :param par: Potenza Nominale impianto (se df la calcola in automatico)
-
-    """
-    # LIBs
-    import pandas as pd
-    #
-
-    if isinstance(par, pd.DataFrame):
-        nom_pwr = par['PwrTOT'].iloc[100] / par['PwrTOT_rel'].iloc[100]
-    elif par is not (int or float):
-        print('Errore in tranf_fun')
-    else:
-        nom_pwr = par
-
-    def rel2tot(x):
-        return nom_pwr * x
-
-    def tot2rel(x):
-        return x / nom_pwr
-
-    return rel2tot, tot2rel
-
-
 def save_rampe(data_path, rampe):
     """
     Salva i punti d'inizio-fine alta-bassa potenza (POI) indicati nella matrice "rampe" la cui riga è così

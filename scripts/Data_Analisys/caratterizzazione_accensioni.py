@@ -7,15 +7,10 @@ I files hanno nome xxx_ACC_XX_descr.png
 # LIBs
 import pandas as pd
 import os
-import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
-from pathlib import Path
-from alive_progress import alive_bar
+
 
 # Custom LIBs
-from cust_libs.misc import folder_tree, mk_dir
-from cust_libs.data_processing import transf_fun, filter_data
 
 #
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')

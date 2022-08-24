@@ -2,9 +2,8 @@
 import pandas as pd
 import os
 import numpy as np
-import matplotlib.pyplot as plt
 # Custom LIBs
-from cust_libs.data_processing import filter_data
+
 #
 data_path_RAW = 'data/raw/Corsini2021_Raw.csv'
 data_path_processed = 'data/processed/Corsini2021/Corsini2021_Processed.csv'

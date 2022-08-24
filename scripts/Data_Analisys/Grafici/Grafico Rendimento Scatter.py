@@ -7,8 +7,8 @@ import matplotlib as mpl
 from numpy.polynomial import Polynomial
 
 # Custom LIBs
-from cust_libs.data_processing import filter_data, transf_fun
-
+from cust_libs.data_processing import filter_data
+from cust_libs.misc import transf_fun
 mode = 'analisi_grad'
 
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')

@@ -4,7 +4,6 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 # Custom LIBs
-from cust_libs.data_processing import filter_data
 
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 

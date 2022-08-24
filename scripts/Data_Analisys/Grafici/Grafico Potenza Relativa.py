@@ -5,8 +5,8 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 # Custom LIBs
-from cust_libs.data_processing import filter_data, transf_fun
-
+from cust_libs.data_processing import filter_data
+from cust_libs.misc import transf_fun
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 
 data_path_ON = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'

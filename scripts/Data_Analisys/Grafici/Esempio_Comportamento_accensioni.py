@@ -9,8 +9,8 @@ import matplotlib.collections as collections
 from numpy.polynomial import Polynomial
 
 # Custom LIBs
-from cust_libs.data_processing import filter_data, transf_fun
-
+from cust_libs.misc import transf_fun
+#
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #
 data_accensione = 'data/processed/Corsini2021/acc/Corsini2021_Acc05.csv'

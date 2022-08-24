@@ -15,8 +15,8 @@ from alive_progress import alive_bar
 
 # Custom LIBs
 from cust_libs.misc import folder_tree, mk_dir
-from cust_libs.data_processing import transf_fun, filter_data
-
+from cust_libs.data_processing import filter_data
+from cust_libs.misc import transf_fun
 #
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #

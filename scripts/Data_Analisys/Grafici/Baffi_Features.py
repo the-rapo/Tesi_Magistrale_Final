@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 # Custom LIBs
-from cust_libs.data_processing import transf_fun
+from cust_libs.misc import transf_fun
 
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #

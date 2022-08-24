@@ -1,3 +1,5 @@
 /.idea/
 /data/
 /temp/
+/hyperopt-sklearn/
+/models/
