@@ -85,7 +85,8 @@ def MAE(model, x_test, y_test, parameters=None, x_transform=None):
 # PLOTTING
 
 
-def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=None, Single_Param=False):
+def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=None, Single_Param=False, add_text=True,
+                  save=None):
     """
     Esegue il plot dell'errore in funzione della potenza relativa.
 
@@ -95,14 +96,18 @@ def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=Non
     :param parameters: specifico per modelli di regressione custom [optz.]
     :param x_transform: specifico per modelli che lo presentano [optz.]
     :param Single_Param: Flag per analisi monovariata [False]
+    :param add_text: Aggiunge il testo riguardo l'errore per P>0.45
+    :param save: Piuttosto che visualizzare l'immagine la salva nel percorso specificato
         """
     # LIBs
     import pandas as pd
     import numpy as np
     from cust_libs.data_processing import filter_data
     import matplotlib.pyplot as plt
+    import matplotlib as mpl
     #
-
+    mpl.rcParams["font.size"] = 18
+    #
     data = pd.read_csv(data_full)
     pwr = np.linspace(0, 1, 21, endpoint=True)
     pwr = [round(num, 3)for num in pwr]
@@ -155,8 +160,9 @@ def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=Non
     ax.axvline(x=9, color='black', linestyle='dashed', linewidth=1, alpha=0.5)
     ax.text(3, avg_rmse + 0.0005, RMSE_text, fontsize='medium', color='red', ha='left')
     ax.text(3, avg_mae + 0.0003, MAE_text, fontsize='medium', color='blue',  ha='left')
-    ax.text(11, 0.0150, RMSE_text_mta, fontsize='medium', color='red', ha='left')
-    ax.text(11, 0.0120, MAE_text_mta, fontsize='medium', color='blue',  ha='left')
+    if add_text:
+        ax.text(11, 0.0150, RMSE_text_mta, fontsize='medium', color='red', ha='left')
+        ax.text(11, 0.0120, MAE_text_mta, fontsize='medium', color='blue',  ha='left')
     ax.axhline(y=avg_mae, color='blue', linestyle=(0, (5, 10)), label='MAE_avg')
     plt.xticks(range(len(error_rmse)), labels, rotation=45)
     ax2 = ax.twinx()
@@ -175,11 +181,14 @@ def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=Non
     if title is not None:
         fig.suptitle(title)
 
-    plt.show()
+    if save is None:
+        plt.show()
+    else:
+        plt.savefig(save, bbox_inches='tight')
     return labels, error_rmse, error_mae, n_elem, avg_rmse, avg_mae
 
 
-def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None, scatter=True):
+def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None, scatter=True, save=None):
     """
     Esegue il plot del modello specificato
 
@@ -188,7 +197,9 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
     :param n: numero di punti per grafico [1000]
     :param parameters: specifico per modelli di regressione custom [optz.]
     :param x_transform: specifico per modelli che lo presentano [optz.]
-    :param scatter: plot sullo sfondo della curva di rendimento storica
+    :param scatter: plot sullo sfondo della curva di rendimento storica [True]
+    :param save: Piuttosto che visualizzare l'immagine la salva nel percorso specificato [optz.]
+
     """
     # LIBs
     import pandas as pd
@@ -196,9 +207,11 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
     import numpy as np
     from cust_libs.data_processing import filter_data
     from cust_libs.misc import transf_fun
+    import matplotlib as mpl
     #
     data = pd.read_csv('Data/Processed/Corsini2021/Corsini2021_Processed_ON.csv')
     alpha = 0.1
+    mpl.rcParams["font.size"] = 18
 
     fig, ax = plt.subplots(figsize=(18, 9))
     if scatter:
@@ -247,7 +260,10 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
     if modelname is not None:
         plt.title(modelname)
     plt.legend(loc='best')
-    plt.show()
+    if save is None:
+        plt.show()
+    else:
+        plt.savefig(save, bbox_inches='tight')
 
     return
 
@@ -289,7 +305,7 @@ def Model_Plot_3D(model, modelname=None, n=1000, parameters=None, x_transform=No
     plt.show()
 
 
-def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameters=None):
+def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameters=None, save=None):
     """
     Esegue un grafico che confronta i dati storici con quelli predetti dal modello
 
@@ -300,9 +316,12 @@ def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameter
     :param parameters: specifico per modelli di regressione custom [optz.]
     :param x_transform: specifico per modelli che lo presentano [optz.]
     :param y_test: plot sullo sfondo della curva di rendimento storica
+    :param save: Piuttosto che visualizzare l'immagine la salva nel percorso specificato [optz.]
+
     """
     # LIBs
     import matplotlib.pyplot as plt
+    import matplotlib as mpl
     #
     if len(x_test) == len(y_test):
         if parameters is None:
@@ -311,13 +330,20 @@ def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameter
             y_pred = model.predict(x_test).reshape(-1, 1)
         else:
             y_pred = model(x_test, *parameters).reshape(-1, 1)
-        plt.figure()
+        mpl.rcParams["font.size"] = 18
+        plt.figure(figsize=(18, 9))
         plt.plot(y_test, color="cornflowerblue", label="Data", linewidth=2)
         plt.plot(y_pred, color="yellowgreen", label="Prediction", linewidth=2)
+        plt.ylim([0.46, 0.53])
+        plt.xlabel('Tempo[min]')
+        plt.ylabel('Rendimento')
         if modelname is not None:
             plt.title(modelname)
         plt.legend()
-        plt.show()
+        if save is None:
+            plt.show()
+        else:
+            plt.savefig(save, bbox_inches='tight')
     else:
         print('Errore nel dataset Test')
     return
@@ -434,7 +460,7 @@ def HyperOpt(x_train, y_train, x_test, y_test, regressor, preprocessing, loss_fn
     # LIBs
     import hyperopt
     from hpsklearn import HyperoptEstimator
-    from hpsklearn import any_regressor, svr, random_forest_regressor, ada_boost_regressor
+    from hpsklearn import any_regressor, svr, random_forest_regressor, ada_boost_regressor,  mlp_regressor
     from hpsklearn import any_preprocessing
     from hyperopt import tpe
     from sklearn.metrics import mean_absolute_error, mean_squared_error, max_error
@@ -455,6 +481,8 @@ def HyperOpt(x_train, y_train, x_test, y_test, regressor, preprocessing, loss_fn
         regressor = random_forest_regressor('rnd_frst')
     elif regressor == 'ADA_BST':
         regressor = ada_boost_regressor('ada_bst')
+    elif regressor == 'MLP':
+        regressor = mlp_regressor('ml_perceptron')
     else:
         print('Il regressore selezionato "' + regressor + '"non è supportato')
         return
