@@ -188,7 +188,8 @@ def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=Non
     return labels, error_rmse, error_mae, n_elem, avg_rmse, avg_mae
 
 
-def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None, scatter=True, save=None):
+def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None, scatter=True, save=None,
+               Single_Param=False):
     """
     Esegue il plot del modello specificato
 
@@ -199,6 +200,7 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
     :param x_transform: specifico per modelli che lo presentano [optz.]
     :param scatter: plot sullo sfondo della curva di rendimento storica [True]
     :param save: Piuttosto che visualizzare l'immagine la salva nel percorso specificato [optz.]
+    :param Single_Param: Flag per analisi monovariata [False]
 
     """
     # LIBs
@@ -234,23 +236,37 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
         gradl.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  <  8.5$ MW/min ',
                                          marker='o', color='b', ax=ax, alpha=alpha)
 
-    x_1 = np.linspace(0.1, 0.9, n, endpoint=True)
-    gradients = [-0.04, -0.01, 0, 0.01, 0.04]
-    labels = [-16, -4, 0, 4, 16]
-    colors = ['b', 'c', 'k', 'm', 'r']
-    for grad, label, col in zip(gradients, labels, colors):
-        grad_column = np.linspace(grad, grad, n)
-        Eff_Pred = np.vstack((x_1.flatten(), grad_column.flatten())).T
+    if Single_Param:
+        x_1 = np.linspace(0.1, 0.9, n, endpoint=True).reshape(-1, 1)
         if parameters is None:
+            Eff_Pred = x_1
             if x_transform is not None:
-                Eff_Pred = x_transform.transform(Eff_Pred)
+                Eff_Pred = x_transform.transform(x_1)
             y_pred = model.predict(Eff_Pred).reshape(-1, 1)
         else:
-            y_pred = model(Eff_Pred, *parameters).reshape(-1, 1)
+            y_pred = model(x_1, *parameters).reshape(-1, 1)
         if scatter:
-            ax.plot(x_1, y_pred, label=r'$ \nabla  P$  = ' + str(label) + ' MW/min', linewidth=3.5, color=col)
+            ax.plot(x_1, y_pred, label=r'Curva di rendimento', linewidth=3.5, color='r')
         else:
-            ax.plot(x_1, y_pred, label=r'$ \nabla  P$  = ' + str(label) + ' MW/min', linewidth=2, color=col)
+            ax.plot(x_1, y_pred, linewidth=2, color='r')
+    else:
+        x_1 = np.linspace(0.1, 0.9, n, endpoint=True)
+        gradients = [-0.04, -0.01, 0, 0.01, 0.04]
+        labels = [-16, -4, 0, 4, 16]
+        colors = ['b', 'c', 'k', 'm', 'r']
+        for grad, label, col in zip(gradients, labels, colors):
+            grad_column = np.linspace(grad, grad, n)
+            Eff_Pred = np.vstack((x_1.flatten(), grad_column.flatten())).T
+            if parameters is None:
+                if x_transform is not None:
+                    Eff_Pred = x_transform.transform(Eff_Pred)
+                y_pred = model.predict(Eff_Pred).reshape(-1, 1)
+            else:
+                y_pred = model(Eff_Pred, *parameters).reshape(-1, 1)
+            if scatter:
+                ax.plot(x_1, y_pred, label=r'$ \nabla  P$  = ' + str(label) + ' MW/min', linewidth=3.5, color=col)
+            else:
+                ax.plot(x_1, y_pred, label=r'$ \nabla  P$  = ' + str(label) + ' MW/min', linewidth=2, color=col)
 
     rel2tot, tot2rel = transf_fun(data)
     ax.set_xlim(0.1, 0.9)
@@ -305,7 +321,7 @@ def Model_Plot_3D(model, modelname=None, n=1000, parameters=None, x_transform=No
     plt.show()
 
 
-def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameters=None, save=None):
+def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False):
     """
     Esegue un grafico che confronta i dati storici con quelli predetti dal modello
 
@@ -542,3 +558,23 @@ def HyperOpt(x_train, y_train, x_test, y_test, regressor, preprocessing, loss_fn
     attributes['MSE-TEST'] = str(mse_test) + ' ( RMSE: ' + str(rmse_test) + ' )'
     attributes['MAE-TEST'] = str(mae_test)
     return model, attributes
+
+# OTHER
+
+
+def Predict_Point_Poly(model, transformer, point):
+    """
+        Equivalente di model.predict() per modelli polinomiali
+
+        :param model: modello polinomiale
+        :param transformer: X-Transformer associato al modello
+        :param point: punto da cui effettuare la previsione
+
+        """
+    # LIBs
+    import numpy as np
+    #
+    to_predict = np.array([[point]])
+    x = transformer.transform(to_predict)
+    y = model.predict(x)
+    return y

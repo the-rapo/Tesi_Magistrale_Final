@@ -4,7 +4,7 @@ import os
 import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
-from cust_libs.modeling import RMSE, MAE, RMSE_MAE_plot
+from cust_libs.modeling import RMSE, MAE, RMSE_MAE_plot, Save_Poly_Model
 import numpy as np
 from cust_libs.misc import transf_fun
 import matplotlib.pyplot as plt
@@ -19,12 +19,13 @@ data = pd.read_csv(data_path)
 x = data['PwrTOT_rel'].values.reshape(-1, 1)
 y = data['Rendimento'].values.reshape(-1, 1)
 
-poly_trans = PolynomialFeatures(degree=poly_deg, include_bias=True)
+poly_trans = PolynomialFeatures(degree=poly_deg, include_bias=False)
 x_trans = poly_trans.fit_transform(x)
 
 model = LinearRegression()
 model.fit(x_trans, y)
 
+'''
 err_rmse = RMSE(model, x, y, x_transform=poly_trans)
 err_mae = MAE(model, x, y, x_transform=poly_trans)
 
@@ -58,4 +59,6 @@ MAE_text = ' MAE = ' "{:.4f}".format(err_mae)
 ax.text(0.7, 0.15, RMSE_text, fontsize='x-large')
 ax.text(0.7, 0.10, MAE_text, fontsize='x-large')
 plt.show()
-RMSE_MAE_plot(model, data_path, x_transform=poly_trans, Single_Param=True)
+'''
+Save_Poly_Model(model, poly_trans, 'models/univariate/Poly/deg4_2')
+# RMSE_MAE_plot(model, data_path, x_transform=poly_trans, Single_Param=True)

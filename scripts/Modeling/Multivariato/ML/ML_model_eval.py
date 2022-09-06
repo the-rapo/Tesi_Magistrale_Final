@@ -8,7 +8,7 @@ import sys
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 
 
-Model_type = 'SVR'
+Model_type = 'RF'
 save_dir = 'temp'
 acc = 'data/processed/Corsini2021/acc/Corsini2021_Acc01.csv'
 if Model_type == 'RF':
