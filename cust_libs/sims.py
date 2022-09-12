@@ -1,17 +1,22 @@
 def simple_ramp(low_p, high_p, t_lowp, t_highp, t_ramp):
     import numpy as np
+    import pandas as pd
 
-    low_p_list = np.linspace(low_p, low_p, t_lowp - 1)
-    ramp_list = np.linspace(low_p, high_p, t_ramp)
-    grad_ramp = ramp_list[1] - ramp_list[0]
-    grad_ramp_list = np.linspace(grad_ramp, grad_ramp, t_ramp)
-    ramp = np.array([ramp_list, grad_ramp_list])
-    ramp = np.transpose(ramp)
-    high_p_list = np.linspace(high_p, high_p, t_highp - 1)
+    p_nom = 410
+
+    low_p_list = np.linspace(low_p, low_p, t_lowp , endpoint=True)
+    ramp_list = np.linspace(low_p, high_p, t_ramp, endpoint=True)
+    high_p_list = np.linspace(high_p, high_p, t_highp , endpoint=True)
 
     PwrTOT_rel = []
     PwrTOT_rel.extend(low_p_list)
     PwrTOT_rel.extend(ramp_list)
     PwrTOT_rel.extend(high_p_list)
 
-    return PwrTOT_rel
+    grad = np.gradient(PwrTOT_rel)
+    data = pd.DataFrame()
+    data['PwrTOT_rel'] = PwrTOT_rel
+    data['Grad_PwrTOT_rel'] = grad
+    data['PwrTOT'] = data['PwrTOT_rel'] * p_nom
+    return data
+

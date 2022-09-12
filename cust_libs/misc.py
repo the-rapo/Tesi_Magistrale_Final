@@ -87,7 +87,7 @@ def transf_fun(par) -> any:
 
     if isinstance(par, pd.DataFrame):
         nom_pwr = par['PwrTOT'].iloc[100] / par['PwrTOT_rel'].iloc[100]
-    elif par is not (int or float):
+    elif not (isinstance(par, int) or isinstance(par, float)):
         print('Errore in tranf_fun')
     else:
         nom_pwr = par
