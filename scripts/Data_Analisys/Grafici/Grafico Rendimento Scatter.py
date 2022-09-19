@@ -22,7 +22,8 @@ mpl.rcParams["font.size"] = 18
 fig, ax = plt.subplots(figsize=(18, 9))
 
 low_grad = filter_data(data, -0.001, 0.001, None, None)
-gradh = filter_data(data, 0.02, None, None, None)       # 8.2 MW / min
+
+gradh = filter_data(data, 0.02, None, None, None)
 gradmh = filter_data(data, 0.005, 0.02, None, None)
 grad0 = filter_data(data, -0.005, 0.005, None, None)
 gradml = filter_data(data, -0.02, -0.005, None, None)
@@ -32,11 +33,11 @@ if mode == 'analisi_grad':
 
     gradh.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  >  8.5$ MW/min ',
                                      marker='o', color='tab:red', ax=ax, alpha=0.6)
-    gradmh.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  \in $ [ 2.0;  8.5 ]  MW/min ',
+    gradmh.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  \in $ [ 2.0;  8.5 ]  MW/min',
                                       marker='o', color='tab:orange', ax=ax, alpha=0.6)
-    grad0.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  \in $ [-2.0;  2.0 ]  MW/min ',
+    grad0.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  \in $ [-2.0;  2.0 ]  MW/min',
                                      marker='o', color='tab:green', ax=ax, alpha=0.6)
-    gradml.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  \in $ [-8.5; -2.0 ]  MW/min ',
+    gradml.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  \in $ [-8.5; -2.0 ]  MW/min',
                                       marker='o', color='tab:cyan', ax=ax, alpha=0.6)
     gradl.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  <  8.5$ MW/min ',
                                      marker='o', color='tab:blue', ax=ax, alpha=0.6)
@@ -86,7 +87,7 @@ ax.set_ylabel('Rendimento [%]')
 secax1_x = ax.secondary_xaxis('top', functions=(rel2tot, tot2rel))
 secax1_x.set_xlabel(r'Potenza $[MW]$')
 plt.legend()
-plt.savefig("temp/scatter_" + mode + ".png", bbox_inches='tight')
+plt.savefig("IO/scatter_" + mode + ".png", bbox_inches='tight')
 
 # fig.suptitle('Curva di rendimento Impianto Corsini - Dataset 2021')
 plt.show()

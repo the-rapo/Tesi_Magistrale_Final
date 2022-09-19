@@ -365,6 +365,52 @@ def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameter
     return
 
 
+def Delibr_Plot(model, data, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False):
+    """
+    Esegue un grafico che confronta i dati storici con quelli predetti dal modello
+
+    :param model: modello di cui eseguire il plot
+    :param modelname: nome del modello per titolo [optz.]
+    :param data
+    :param parameters: specifico per modelli di regressione custom [optz.]
+    :param x_transform: specifico per modelli che lo presentano [optz.]
+    :param save: Piuttosto che visualizzare l'immagine la salva nel percorso specificato [optz.]
+
+    """
+    # LIBs
+    import matplotlib.pyplot as plt
+    import matplotlib as mpl
+    #
+    x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
+    y_true = data['Rendimento'].values.reshape(-1, 1)
+    if parameters is None:
+        if x_transform is not None:
+            x = x_transform.transform(x)
+        y_pred = model.predict(x).reshape(-1, 1)
+    else:
+        y_pred = model(x, *parameters).reshape(-1, 1)
+    mpl.rcParams["font.size"] = 18
+    plt.figure(figsize=(10, 10))
+
+    plt.scatter(y_true, y_pred, c='crimson')
+
+    p1 = max(max(y_true), max(y_pred))
+    p2 = min(min(y_true), min(y_pred))
+    plt.plot([p1, p2], [p1, p2], 'b-')
+    plt.xlabel('True Values', fontsize=15)
+    plt.ylabel('Predictions', fontsize=15)
+    plt.axis('equal')
+    plt.show()
+    if modelname is not None:
+        plt.title(modelname)
+    plt.legend()
+    if save is None:
+        plt.show()
+    else:
+        plt.savefig(save, bbox_inches='tight')
+    return
+
+
 # SAVE / LOAD
 
 

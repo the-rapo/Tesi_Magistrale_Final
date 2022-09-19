@@ -126,4 +126,5 @@ collection = collections.BrokenBarHCollection.span_where(
 
 ax.add_collection(collection)
 
-plt.savefig(save_path + 'Analisi_rend.png', bbox_inches='tight')
+# plt.savefig(save_path + 'Analisi_rend.png', bbox_inches='tight')
+plt.show()

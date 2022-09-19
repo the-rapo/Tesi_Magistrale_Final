@@ -366,3 +366,27 @@ def load_rampe(data_path):
     rampe = load(rampe_folder + '/' + rampe_name)
     return rampe
 
+
+def compute(data, opt):
+
+    import sys
+    import numpy as np
+    if opt == 'avg_eta':
+        tot_energy_in = sum(data['Pwr_in'].values) / 60
+        tot_energy_out = sum(data['PwrTOT'].values) / 60
+        rendimento = tot_energy_out / tot_energy_in
+        return rendimento
+
+    elif opt == 'avg_eta_t':
+        rendimento_t = np.average(data['Rendimento'].values)
+        return rendimento_t
+
+    elif opt == 'tot_en_out':
+        tot_energy_out = sum(data['PwrTOT'].values) / 60
+        return tot_energy_out
+    elif opt == 'tot_en_in':
+        tot_energy_in = sum(data['Pwr_in'].values) / 60
+        return tot_energy_in
+
+    else:
+        sys.exit("Errore")

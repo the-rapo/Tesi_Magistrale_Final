@@ -1,6 +1,6 @@
 import pandas as pd
 
-from cust_libs.modeling import Load_ML_Model, Model_Plot, RMSE_MAE_plot, Pred_Plot
+from cust_libs.modeling import Load_ML_Model, Model_Plot, RMSE_MAE_plot, Pred_Plot, Delibr_Plot
 import matplotlib.pyplot as plt
 import os
 import sys
@@ -11,6 +11,8 @@ os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_F
 Model_type = 'RF'
 save_dir = 'temp'
 acc = 'data/processed/Corsini2021/acc/Corsini2021_Acc01.csv'
+data_full = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
+
 if Model_type == 'RF':
     modelML_path = 'models/multivariate/ML/RND_FOR/RND_FOR_02.joblib'
 elif Model_type == 'ALL':
@@ -31,6 +33,8 @@ print(model.best_model())
 # RMSE_MAE_plot(model, 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv', add_text=False, save=save_path_error)
 
 data_acc = pd.read_csv(acc)
+data = pd.read_csv(data_full)
 x_pred = data_acc[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
 y_true = data_acc['Rendimento'].values.reshape(-1, 1)
-Pred_Plot(model, x_pred, y_true, x_transform=None, modelname=None, parameters=None, save=save_path_example)
+# Pred_Plot(model, x_pred, y_true, x_transform=None, modelname=None, parameters=None, save=save_path_example)
+Delibr_Plot(model, data, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False)

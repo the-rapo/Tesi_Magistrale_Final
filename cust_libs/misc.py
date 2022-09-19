@@ -101,6 +101,24 @@ def transf_fun(par) -> any:
     return rel2tot, tot2rel
 
 
+def gas_eur(costo) -> any:
+    """
+    Definisce le funzioni di trasferimento tra potenza e potenza relativa
+
+    :param costo: Potenza Nominale impianto (se df la calcola in automatico)
+
+    """
+    # LIBs
+
+    def gas2eur(x):
+        return costo * x / 1000000
+
+    def eur2gas(x):
+        return x * 1000000 / costo
+
+    return gas2eur, eur2gas
+
+
 def Train_Data_Split(acc_fldr: str, train_perc: float, out_long: bool = False, seed: int = None,
                      verbose: bool = True) -> tuple:
     """
