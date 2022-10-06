@@ -119,6 +119,16 @@ def gas_eur(costo) -> any:
     return gas2eur, eur2gas
 
 
+def SOC_MWh(bess_size):
+    def MWh2SOC(x):
+        return x / bess_size
+
+    def SOC2MWh(x):
+        return x * bess_size
+
+    return MWh2SOC, SOC2MWh
+
+
 def Train_Data_Split(acc_fldr: str, train_perc: float, out_long: bool = False, seed: int = None,
                      verbose: bool = True) -> tuple:
     """

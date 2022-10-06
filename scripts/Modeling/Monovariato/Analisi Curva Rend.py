@@ -13,7 +13,7 @@ from cust_libs.misc import transf_fun
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #
 model_fld = 'models/univariate/Poly/deg4_low'
-poly_modelname = 'Mono-4'
+poly_modelname = 'Paper'
 data = pd.read_csv('data/processed/Corsini2021/Corsini2021_Processed_ON.csv')
 save_path = 'temp/'
 #

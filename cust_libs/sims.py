@@ -170,14 +170,8 @@ def simulation(data, poi, bess_size):
         hp_start = poi[riga][2]
         hp_end = poi[riga][3]
 
-        print(lp_start)
-        print(lp_end)
-        print(hp_start)
-        print(hp_end)
-
         lp_avg = np.average(data['PwrTOT_rel'].iloc[lp_start: lp_end].values) * Nom_pwr # MW
         # lp_avg = 0.5
-        print(lp_avg)
         lp_time = (lp_end - lp_start)  # min
         hp_time = (hp_end - hp_start)  # min
         hp_avg = np.average(data['PwrTOT_rel'].iloc[hp_start: hp_end].values) * Nom_pwr # MW
@@ -186,7 +180,7 @@ def simulation(data, poi, bess_size):
             BESS_avg_lp_pwr = (BESS_size - 0) * .95 / (lp_time / 60) # MW
         else:
             BESS_avg_lp_pwr = (BESS_size - BESS_SOC[-1]) * .95 / (lp_time / 60) # MW
-            print(BESS_avg_lp_pwr)
+
 
         if BESS_avg_lp_pwr + lp_avg > lp_treshold * Nom_pwr:
             BESS_avg_lp_pwr = lp_treshold * Nom_pwr - lp_avg # MW
@@ -198,9 +192,7 @@ def simulation(data, poi, bess_size):
             else:
                 BESS_avg_hp_pwr = BESS_size / (hp_time / 60)  # MW
         lp_pwr_setting = (lp_avg + BESS_avg_lp_pwr) / 410  # %
-        print(lp_pwr_setting)
         hp_pwr_setting = (hp_avg - BESS_avg_hp_pwr) / 410  # %
-        print(hp_pwr_setting)
         for i in range(last_processed + 1, lp_start):
             Power_demand = data['PwrTOT_rel'].iloc[i]
             Plant_pwr_mod.append(Power_demand)
@@ -323,6 +315,7 @@ def simulation(data, poi, bess_size):
     data_new['PwrTOT'] = data_new['PwrTOT_rel'] * p_nom
 
     return data_new
+
 
 def simulation_old(data, poi):
     import numpy as np
@@ -503,6 +496,10 @@ def add_eta(data, model_in):
         model_path = 'models/univariate/Poly/deg4_low'
     elif model_in == 'mono_mod':
         model_path = 'models/univariate/Poly/deg4_low'
+    elif model_in == 'paper':
+        model_path = 'models/univariate/Poly/paper'
+    elif model_in == 'paper2':
+        model_path = 'models/univariate/Poly/paper2'
     else:
         sys.exit("Errore")
 
@@ -510,13 +507,13 @@ def add_eta(data, model_in):
         model, _ = Load_ML_Model(model_path)
         x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
         eta = model.predict(x)
-    elif model_in == 'mono' or model_in == 'mono_mod':
+    elif model_in == 'mono' or model_in == 'mono_mod' or model_in == 'paper' or model_in == 'paper2':
         model, transformer = Load_Poly_model(model_path)
         x = data['PwrTOT_rel'].values.reshape(-1, 1)
         eta = model.predict(transformer.transform(x))
         if model_in == 'mono_mod':
             eta = np.array(eta)
-            eta = eta + 0.05
+            eta = eta + 0.04
     else:
         sys.exit("Errore")
 
@@ -529,41 +526,57 @@ def add_eta(data, model_in):
 def plot_coatto(data_bess, data_nobess, delta_eta=None, BESS_size=None):
     import matplotlib.pyplot as plt
     import numpy as np
+    from cust_libs.misc import transf_fun, SOC_MWh
+    rel2tot, tot2rel = transf_fun(410)
 
     fig, ax = plt.subplots(2, 2, figsize=(16, 9))  # 20 10
 
-    ax[0][0].plot(data_nobess['PwrTOT_rel'].values, color='b', alpha=0.3, label='Impianto senza BESS')
-    ax[0][0].plot(data_bess['PwrTOT_rel'].values, color='r', label='Impianto con BESS')
+    ax[0][0].plot(data_nobess['PwrTOT_rel'].values, color='tab:blue', alpha=0.75, label='Impianto senza BESS')
+    ax[0][0].plot(data_bess['PwrTOT_rel'].values, color='tab:red', label='Impianto con BESS')
+    locs_y = ax[0][0].get_yticks()
+    ax[0][0].set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax[0][0].set_ylabel('Potenza Relativa [%]')
+    secax00_y = ax[0][0].secondary_yaxis('right', functions=(rel2tot, tot2rel))
+    secax00_y.set_ylabel(r'Potenza $[MW]$')
 
-    ax[1][0].plot(data_nobess['Rendimento'].values, color='b', alpha=0.3, label='Impianto senza BESS')
-    ax[1][0].plot(data_bess['Rendimento'].values, color='r', label='Impianto con BESS')
+    ax[1][0].plot(data_nobess['Rendimento'].values, color='tab:blue', alpha=0.75, label='Impianto senza BESS')
+    ax[1][0].plot(data_bess['Rendimento'].values, color='tab:red', label='Impianto con BESS')
+    locs_y = ax[1][0].get_yticks()
+    ax[1][0].set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax[1][0].set_ylabel('Rendimento [%]')
     # ax[0][1].plot(BESS_SOC, label='SOC')
-    ax[0][1].plot(data_bess['BESS_pwr'].values, label='Potenza BESS', color='r')
+    ax[0][1].plot(data_bess['BESS_pwr'].values, label='Potenza BESS', color='tab:red')
+    ax[0][1].yaxis.tick_right()
+    ax[0][1].yaxis.set_label_position("right")
     ax[0][1].set_ylabel('Potenza [MW]')
 
-    ax[1][1].plot(data_bess['BESS_SOC'].values, color='r')
+    ax[1][1].plot(data_bess['BESS_SOC'].values, color='tab:red')
     if BESS_size is not None:
-        ax[1][1].set_ylabel('SOC [%]')
-        locs = ax[1][1].get_yticks()
-        ax[1][1].set_yticks(locs, np.round(locs / BESS_size * 100, 1))
+        MWh2SOC, SOC2MWh = SOC_MWh(BESS_size)
+
+        ax[1][1].set_ylabel('SOC [MWh]')
+        secax11_y = ax[1][1].secondary_yaxis('left', functions=(MWh2SOC, SOC2MWh))
+        secax11_y.set_ylabel(r'SOC [%]')
+        locs = secax11_y.get_yticks()
+        secax11_y.set_yticks(locs, np.round(locs * 100, 0).astype(int))
+        ax[1][1].yaxis.tick_right()
+        ax[1][1].yaxis.set_label_position("right")
     else:
         ax[1][1].set_ylabel('SOC [MW]')
 
-    ax[0, 0].set_title("Curva di potenza dell'impianto")
+    ax[0, 0].set_title("Curva di potenza impianto")
     ax[0, 1].set_title("Curva di potenza BESS")
-    ax[1, 0].set_title("Curva di rendimento dell'impianto")
+    ax[1, 0].set_title("Curva di rendimento impianto")
     ax[1, 1].set_title("Stato di carica del BESS")
 
     ax[0][0].legend(loc="best")
 
     if delta_eta is not None:
-        y_text = ax[1][0].get_yticks()[2] + 0.001
+        y_text = ax[1][0].get_yticks()[1] + 0.001
 
         ax[1][0].text(len(data_bess) * 0.5, y_text,
-                      r'$ \Delta \eta$ = +' "{:.2f}".format(delta_eta * 100) + ' %',
-                      color='r', ha='center', fontsize=16)
-        print(y_text)
-        print(ax[1][0].get_yticks()[1])
+                      r'$\Delta \eta$' + ' = +' "{:.2f}".format(delta_eta * 100) + ' %',
+                      color='k', ha='center', fontsize=18)
     ax[1][0].legend(loc="best")
     # fig.subplots_adjust(top=0.93)
     plt.show()

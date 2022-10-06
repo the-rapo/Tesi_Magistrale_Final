@@ -20,9 +20,9 @@ LP_tresh = 0.64
 HP_tresh = 0.72
 
 bess_size = 200
-method = 'manual'
-regr_type = 'mono_mod'
-acc_path = 'data/processed/Corsini2021/acc/Corsini2021_Acc04.csv'
+method = 'auto'
+regr_type = 'paper'
+acc_path = 'data/processed/Corsini2021/acc/Corsini2021_Acc02.csv'
 acc = pd.read_csv(acc_path)
 acc_corr = add_eta(acc, regr_type)
 eta_std = compute(acc_corr, 'avg_eta')

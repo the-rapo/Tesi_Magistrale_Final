@@ -18,7 +18,7 @@ LP_tresh = 0.5
 HP_tresh = 0.85
 
 method = 'auto'
-regr_type = 'mono_mod'
+regr_type = 'paper'
 
 ramp_carico = simple_ramp(low_p, high_p, t_lowp, t_highp, t_ramp)
 ramp_carico = add_eta(ramp_carico, regr_type)
