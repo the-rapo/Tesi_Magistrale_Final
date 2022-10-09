@@ -12,6 +12,8 @@ data_path_ON = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
 # - DATI
 low_eta = 0.5
 high_eta = 0.515
+censura = True
+rend_max = 0.545
 
 data_ON = pd.read_csv(data_path_ON)
 rendimento = data_ON['Rendimento'].values
@@ -49,9 +51,15 @@ ax0.xaxis.set_ticks(np.arange(0.46, 0.54, 0.005))
 locs_y = ax0.get_yticks()
 locs_x = ax0.get_xticks()
 ax0.set_yticks(locs_y, np.round(locs_y / len(rendimento) * 100, 1))
-ax0.set_xticks(locs_x, np.round(locs_x * 100, 1))
 ax0.set_ylabel('Percentuale [%]')
-ax0.set_xlabel('Rendimento [%]')
+if censura:
+    ax0.set_xticks(locs_x, np.round(locs_x * 100 / rend_max, 1))
+    ax0.set_xlabel('Rendimento Rel. [%]')
+
+else:
+    ax0.set_xticks(locs_x, np.round(locs_x * 100, 1))
+    ax0.set_xlabel('Rendimento [%]')
+
 
 ax0.axvline(x=low_eta, color='black', linestyle='dashed', linewidth=1, alpha=0.5)
 ax0.axvline(x=high_eta, color='black', linestyle='dashed', linewidth=1, alpha=0.5)
@@ -85,6 +93,6 @@ for i, p in enumerate(wedges):
     ax1.annotate(pie_labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                  horizontalalignment='center', **kw, fontsize=11)
 
-plt.show()
+# plt.show()
 
-plt.savefig("temp/rendimento_hist.png", bbox_inches='tight')
+plt.savefig("IO/rendimento_hist.png", bbox_inches='tight', dpi=300)

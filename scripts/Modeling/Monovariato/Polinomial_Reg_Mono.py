@@ -5,6 +5,7 @@ import pandas as pd
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
 from cust_libs.modeling import RMSE, MAE, RMSE_MAE_plot, Save_Poly_Model
+from cust_libs.data_processing import filter_data
 import numpy as np
 from cust_libs.misc import transf_fun
 import matplotlib.pyplot as plt
@@ -16,10 +17,12 @@ os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_F
 #
 data_path = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
 data = pd.read_csv(data_path)
+data = filter_data(data, -0.005, 0.005, None, None)
+
 x = data['PwrTOT_rel'].values.reshape(-1, 1)
 y = data['Rendimento'].values.reshape(-1, 1)
 
-poly_trans = PolynomialFeatures(degree=poly_deg, include_bias=False)
+poly_trans = PolynomialFeatures(degree=poly_deg, include_bias=True)
 x_trans = poly_trans.fit_transform(x)
 
 model = LinearRegression()
@@ -60,5 +63,5 @@ ax.text(0.7, 0.15, RMSE_text, fontsize='x-large')
 ax.text(0.7, 0.10, MAE_text, fontsize='x-large')
 plt.show()
 '''
-Save_Poly_Model(model, poly_trans, 'models/univariate/Poly/deg4_2')
-# RMSE_MAE_plot(model, data_path, x_transform=poly_trans, Single_Param=True)
+Save_Poly_Model(model, poly_trans, 'models/univariate/Poly/deg4_low_2')
+RMSE_MAE_plot(model, data_path, x_transform=poly_trans, Single_Param=True)

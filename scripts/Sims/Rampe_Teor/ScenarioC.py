@@ -1,4 +1,4 @@
-from cust_libs.sims import simple_ramp, simple_sim, add_eta, plot_coatto, simulation
+from cust_libs.sims import simple_ramp, simple_sim, add_eta, plot_coatto, simulation, media
 from cust_libs.data_processing import compute
 from cust_libs.modeling import Load_ML_Model
 from cust_libs.misc import transf_fun
@@ -14,30 +14,30 @@ os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_F
 
 low_p1 = 0.47
 t_lowp1 = 9 * 60 - 10
-high_p1 = 0.9
+high_p1 = 0.80
 t_highp1 = 4 * 60 - 10
 low_p2 = 0.47
 t_lowp2 = 5 * 60 - 10
-high_p2 = 0.9
+high_p2 = 0.80
 t_highp2 = 5 * 60 - 10
 
 
 t_ramp1 = 20
 t_ramp2 = 20
 t_ramp3 = 20
-t_first_cicle = t_lowp1 + t_ramp1 + t_highp1 + t_ramp2 - 1
+t_first_cicle = t_lowp1 + t_ramp1 + t_highp1 + t_ramp2 -1
 
 p_nom = 410
 
-poi1 = [1, t_lowp1, t_lowp1 + t_ramp1, t_lowp1 + t_ramp1 + t_highp1 -10]
-poi2 = [t_first_cicle - 10, t_first_cicle + t_lowp2, t_first_cicle + t_lowp2 + t_ramp3, t_first_cicle + t_lowp2 + t_ramp3
+poi1 = [1, t_lowp1, t_lowp1 + t_ramp1, t_lowp1 + t_ramp1 + t_highp1]
+poi2 = [t_first_cicle , t_first_cicle + t_lowp2, t_first_cicle + t_lowp2 + t_ramp3, t_first_cicle + t_lowp2 + t_ramp3
         + t_highp2]
 
 poi = [poi1, poi2]
-bess_size = 200
+bess_size =200
 
-regr_type = 'mono_mod'
-method = 'brute-force'
+regr_type = 'mono2'
+method = 'opt'
 
 
 low_p_list1 = np.linspace(low_p1, low_p1, t_lowp1, endpoint=True)
@@ -71,6 +71,7 @@ if method == 'brute-force':
     rendimento_max = 0
     winner_LP = 0
     winner_HP = 0
+    iter = 0
     for i in np.arange(0.45, 0.65, 0.01):
         for j in np.arange(i + 0.01, 0.9, 0.01):
             ramp_BESS = simple_sim(i, j, bess_size, ramp_carico)
@@ -80,13 +81,17 @@ if method == 'brute-force':
                 rendimento_max = eta
                 winner_LP = i
                 winner_HP = j
-        print('Migliori parametri')
-        print('L_op' + str(winner_LP))
-        print('H_op' + str(winner_HP))
+            iter += 1
+            print(iter)
+    print('Migliori parametri')
+    print('L_op' + str(winner_LP))
+    print('H_op' + str(winner_HP))
 
     ramp_BESS = simple_sim(winner_LP, winner_HP, bess_size, ramp_carico)
 elif method == 'opt':
     ramp_BESS = simulation(ramp_carico, poi, bess_size)
+elif method == 'media':
+    ramp_BESS = media(ramp_carico)
 else:
     sys.exit("Errore")
 
@@ -94,4 +99,8 @@ ramp_BESS = add_eta(ramp_BESS, regr_type)
 
 eta_std = compute(ramp_carico, 'avg_eta')
 eta = compute(ramp_BESS, 'avg_eta')
-plot_coatto(ramp_BESS, ramp_carico, eta - eta_std, bess_size)
+if method == 'media':
+    plot_coatto(ramp_BESS, ramp_carico, eta - eta_std)
+    print(max(ramp_BESS['BESS_SOC']))
+else:
+    plot_coatto(ramp_BESS, ramp_carico, eta - eta_std, 200)

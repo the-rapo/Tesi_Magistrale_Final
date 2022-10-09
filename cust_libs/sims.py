@@ -494,6 +494,10 @@ def add_eta(data, model_in):
         model_path = 'models/multivariate/ML/SVR/SVR_01.joblib'
     elif model_in == 'mono':
         model_path = 'models/univariate/Poly/deg4_low'
+    elif model_in == 'mono2':
+        model_path = 'models/univariate/Poly/deg4'
+    elif model_in == 'multi':
+        model_path = 'models/multivariate/Poly/deg4'
     elif model_in == 'mono_mod':
         model_path = 'models/univariate/Poly/deg4_low'
     elif model_in == 'paper':
@@ -507,9 +511,13 @@ def add_eta(data, model_in):
         model, _ = Load_ML_Model(model_path)
         x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
         eta = model.predict(x)
-    elif model_in == 'mono' or model_in == 'mono_mod' or model_in == 'paper' or model_in == 'paper2':
+    elif model_in == 'mono' or model_in == 'mono_mod' or model_in == 'paper' or model_in == 'paper2' or model_in == 'mono2':
         model, transformer = Load_Poly_model(model_path)
         x = data['PwrTOT_rel'].values.reshape(-1, 1)
+        eta = model.predict(transformer.transform(x))
+    elif model_in == 'multi':
+        model, transformer = Load_Poly_model(model_path)
+        x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
         eta = model.predict(transformer.transform(x))
         if model_in == 'mono_mod':
             eta = np.array(eta)
@@ -562,8 +570,9 @@ def plot_coatto(data_bess, data_nobess, delta_eta=None, BESS_size=None):
         ax[1][1].yaxis.tick_right()
         ax[1][1].yaxis.set_label_position("right")
     else:
-        ax[1][1].set_ylabel('SOC [MW]')
-
+        ax[1][1].set_ylabel('SOC [MWh]')
+        ax[1][1].yaxis.tick_right()
+        ax[1][1].yaxis.set_label_position("right")
     ax[0, 0].set_title("Curva di potenza impianto")
     ax[0, 1].set_title("Curva di potenza BESS")
     ax[1, 0].set_title("Curva di rendimento impianto")
@@ -580,3 +589,53 @@ def plot_coatto(data_bess, data_nobess, delta_eta=None, BESS_size=None):
     ax[1][0].legend(loc="best")
     # fig.subplots_adjust(top=0.93)
     plt.show()
+
+
+def media(data):
+    import numpy as np
+    #
+    bess = []
+    bess_SOC = []
+    first_ramp = True
+    new_load = []
+    bess_empty = True
+    p_nom = 410
+    #
+    avg = np.average(data['PwrTOT_rel'].values)
+    for i in range(data.shape[0]):
+        if not first_ramp:
+            if data['PwrTOT_rel'].iloc[i] > avg:
+                if bess_empty:
+                    bess.append(0)
+                    bess_SOC.append(bess_SOC[i - 1])
+                    new_load.append(data['PwrTOT_rel'].iloc[i])
+                else:
+                    bess.append((data['PwrTOT_rel'].iloc[i] - avg) * 410)
+                    bess_SOC.append(bess_SOC[i - 1] - bess[i] / 60)
+                    new_load.append(avg)
+            else:
+                bess.append((data['PwrTOT_rel'].iloc[i] - avg) * 410)
+                bess_SOC.append(bess_SOC[i - 1] - bess[i] / 60)
+                new_load.append(avg)
+        else:
+            bess.append(0)
+            bess_SOC.append(0)
+            new_load.append(data['PwrTOT_rel'].iloc[i])
+            if data['PwrTOT_rel'].iloc[i] > 0.45:
+                first_ramp = False
+
+        if bess_SOC[i] <= 0:
+            bess_empty = True
+            bess_SOC[i] = 0
+        else:
+            bess_empty = False
+
+    grad = np.gradient(new_load)
+    data_new = pd.DataFrame()
+    data_new['PwrTOT_rel'] = new_load
+    data_new['Grad_PwrTOT_rel'] = grad
+    data_new['BESS_pwr'] = bess
+    data_new['BESS_SOC'] = bess_SOC
+    data_new['PwrTOT'] = data_new['PwrTOT_rel'] * p_nom
+
+    return data_new

@@ -18,7 +18,9 @@ rel2tot, tot2rel = transf_fun(data)
 mpl.rcParams["font.size"] = 22
 fig, ax = plt.subplots(figsize=(18, 6))
 
-feature = 'Rendimento'
+feature = 'Grad_PwrTOT_rel'
+censura = True
+rend_max = 0.545
 
 if feature == 'PwrTOT_rel':
     X = data[feature].values
@@ -31,20 +33,25 @@ if feature == 'PwrTOT_rel':
     locs_x = ax.get_xticks()
     ax.set_xticks(locs_x, np.round(locs_x * 100, 1))
     plt.tight_layout()
-    plt.savefig("temp/baffo_PwrTOT_rel.png", bbox_inches='tight')
+    plt.savefig("IO/baffo_PwrTOT_rel.png", bbox_inches='tight', dpi=300)
 
 elif feature == 'Rendimento':
     X = data[feature].values
     ax.violinplot(X, showmeans=True, vert=False)
     ax.get_yaxis().set_visible(False)
-    ax.set_xlabel('Rendimento [%]')
+    if censura:
+        ax.xaxis.set_ticks(np.linspace(0, rend_max, 6, endpoint=True))
+        locs_x = ax.get_xticks()
+        ax.set_xticks(locs_x, np.round(locs_x * 100 / rend_max, 1))
+        ax.set_xlabel('Rendimento Rel. [%]')
 
-    ax.set_xlim([0, 0.55])
-    locs_x = ax.get_xticks()
-    ax.set_xticks(locs_x, np.round(locs_x * 100, 1))
+    else:
+        locs_x = ax.get_xticks()
+        ax.set_xticks(locs_x, np.round(locs_x * 100, 1))
+        ax.set_xlabel('Rendimento [%]')
     plt.tight_layout()
-    plt.savefig("temp/baffo_Rendimento.png", bbox_inches='tight')
-
+    plt.savefig("IO/baffo_Rendimento.png", bbox_inches='tight', dpi=300)
+    # plt.show()
 elif feature == 'Grad_PwrTOT_rel':
     X = data[feature].values
     ax.violinplot(X, showmeans=True, vert=False)
@@ -55,4 +62,4 @@ elif feature == 'Grad_PwrTOT_rel':
     locs_x = ax.get_xticks()
     ax.set_xticks(locs_x, np.round(locs_x * 100, 1))
     plt.tight_layout()
-    plt.savefig("temp/baffo_Gradiente.png", bbox_inches='tight')
+    plt.savefig("IO/baffo_Gradiente.png", bbox_inches='tight', dpi=300)

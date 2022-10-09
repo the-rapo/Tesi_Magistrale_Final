@@ -85,6 +85,6 @@ for i, p in enumerate(wedges):
     ax1.annotate(pie_labels[i], xy=(x, y), xytext=(1.35*np.sign(x), 1.4*y),
                  horizontalalignment='center', **kw, fontsize=11)
 
-plt.show()
+# plt.show()
 
-plt.savefig("temp/pot_rel_hist.png", bbox_inches='tight')
+plt.savefig("IO/pot_rel_hist.png", bbox_inches='tight', dpi=300)

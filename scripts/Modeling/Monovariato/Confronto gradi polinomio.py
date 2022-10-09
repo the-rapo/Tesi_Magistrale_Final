@@ -15,10 +15,12 @@ filtered = False
 #
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 n = 1000
+censura = True
+rend_max = 0.545
 #
 data_path = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
 data = pd.read_csv(data_path)
-save_path = 'temp/'
+save_path = 'IO/'
 x = data['PwrTOT_rel'].values.reshape(-1, 1)
 y = data['Rendimento'].values.reshape(-1, 1)
 
@@ -78,7 +80,15 @@ ax.add_collection(collection)
 
 ax.set_ylim([0, 0.6])
 
-ax.set_ylabel('Rendimento')
+if censura:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+    ax.set_ylabel('Rendimento Rel. [%]')
+else:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax.set_ylabel('Rendimento [%]')
+
 ax.set_xlabel(r'$P_{Rel}$')
 secax_x = ax.secondary_xaxis(
     'top', functions=(rel2tot, tot2rel))
@@ -87,3 +97,4 @@ secax_x.set_xlabel(r'$P\ $ [MW]')
 plt.legend(loc='best')
 
 plt.savefig(save_path + 'gradi_pol_mono.png', bbox_inches='tight')
+plt.show()

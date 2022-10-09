@@ -10,7 +10,8 @@ from numpy.polynomial import Polynomial
 from cust_libs.data_processing import filter_data
 from cust_libs.misc import transf_fun
 mode = 'analisi_grad'
-
+censura = True
+rend_max = 0.545
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #
 data_path_ON = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
@@ -42,15 +43,15 @@ if mode == 'analisi_grad':
     gradl.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  <  8.5$ MW/min ',
                                      marker='o', color='tab:blue', ax=ax, alpha=0.6)
 
-    x0 = grad0['PwrTOT_rel'].values
-    y0 = grad0['Rendimento'].values
-    p0 = Polynomial.fit(x0, y0, 4)
-    ax.plot(*p0.linspace(), color='k', linewidth=3, label=r'Reg. pol. $\nabla P > 8.5$')
-
     xh = gradh['PwrTOT_rel'].values
     yh = gradh['Rendimento'].values
     ph = Polynomial.fit(xh, yh, 4)
-    ax.plot(*ph.linspace(), color='r', linewidth=3, label=r'Reg. pol. $ |\nabla P| < 2$')
+    ax.plot(*ph.linspace(), color='k', linewidth=3, label=r'Reg. pol. $\nabla P > 8.5$')
+
+    x0 = grad0['PwrTOT_rel'].values
+    y0 = grad0['Rendimento'].values
+    p0 = Polynomial.fit(x0, y0, 4)
+    ax.plot(*p0.linspace(), color='r', linewidth=3, label=r'Reg. pol. $ |\nabla P| < 2$')
 
     xl = gradl['PwrTOT_rel'].values
     yl = gradl['Rendimento'].values
@@ -77,17 +78,24 @@ elif mode == 'vs':
 rel2tot, tot2rel = transf_fun(data)
 
 ax.set_xlim([0, 0.9])
-ax.set_ylim([0, 0.55])
+ax.set_ylim([0, 0.535])
 locs_x = ax.get_xticks()
 ax.set_xticks(locs_x, np.round(locs_x * 100, 1))
 ax.set_xlabel('Potenza Relativa [%]')
-locs_y = ax.get_yticks()
-ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
-ax.set_ylabel('Rendimento [%]')
+
+if censura:
+    ax.yaxis.set_ticks(np.linspace(0, rend_max, 6, endpoint=True))
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+    ax.set_ylabel('Rendimento Rel. [%]')
+else:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax.set_ylabel('Rendimento [%]')
 secax1_x = ax.secondary_xaxis('top', functions=(rel2tot, tot2rel))
 secax1_x.set_xlabel(r'Potenza $[MW]$')
 plt.legend()
-plt.savefig("IO/scatter_" + mode + ".png", bbox_inches='tight')
+plt.savefig("IO/scatter_" + mode + ".png", bbox_inches='tight', dpi=300)
 
 # fig.suptitle('Curva di rendimento Impianto Corsini - Dataset 2021')
 plt.show()

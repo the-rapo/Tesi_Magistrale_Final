@@ -12,10 +12,12 @@ from cust_libs.misc import transf_fun
 #
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #
-model_fld = 'models/univariate/Poly/deg4_low'
+model_fld = 'models/univariate/Poly/deg4_low_2'
 poly_modelname = 'Paper'
 data = pd.read_csv('data/processed/Corsini2021/Corsini2021_Processed_ON.csv')
-save_path = 'temp/'
+save_path = 'IO/'
+censura = True
+rend_max = 0.545
 #
 mpl.rcParams["font.size"] = 18
 model, poly = Load_Poly_model(model_fld)
@@ -28,9 +30,9 @@ y_rend_grad = np.gradient(y_rend)
 nabla_eta45_6 = float(Predict_Point_Poly(model, poly, 0.6) - Predict_Point_Poly(model, poly, 0.45))
 nabla_eta6_7 = float(Predict_Point_Poly(model, poly, 0.7) - Predict_Point_Poly(model, poly, 0.6))
 nabla_eta7_9 = float(Predict_Point_Poly(model, poly, 0.9) - Predict_Point_Poly(model, poly, 0.7))
-text_napla1 = r' $\nabla$ $\eta$ = ' "{:.4f}".format(nabla_eta45_6)
-text_napla2 = r' $\nabla$ $\eta$ = ' "{:.4f}".format(nabla_eta6_7)
-text_napla3 = r' $\nabla$ $\eta$ = ' "{:.4f}".format(nabla_eta7_9)
+text_napla1 = r' $\Delta$ $\eta$ = ' "{:.4f}".format(nabla_eta45_6)
+text_napla2 = r' $\Delta$ $\eta$ = ' "{:.4f}".format(nabla_eta6_7)
+text_napla3 = r' $\Delta$ $\eta$ = ' "{:.4f}".format(nabla_eta7_9)
 
 # PLOT
 '''
@@ -91,7 +93,6 @@ plt.savefig(save_path + 'Analisi_rend.png', bbox_inches='tight')
 fig, ax = plt.subplots(figsize=(18, 9))
 ax.plot(x_plot, y_rend, color='k', linewidth=4)
 
-ax.set_ylabel(r'Rendimento')
 ax.set_xlabel(r'Potenza Relativa')
 secax_x = ax.secondary_xaxis(
     'top', functions=(rel2tot, tot2rel))
@@ -126,5 +127,14 @@ collection = collections.BrokenBarHCollection.span_where(
 
 ax.add_collection(collection)
 
-# plt.savefig(save_path + 'Analisi_rend.png', bbox_inches='tight')
+if censura:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+    ax.set_ylabel('Rendimento Rel. [%]')
+else:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax.set_ylabel('Rendimento [%]')
+
+plt.savefig(save_path + 'Analisi_rend.png', bbox_inches='tight', dpi=300)
 plt.show()
