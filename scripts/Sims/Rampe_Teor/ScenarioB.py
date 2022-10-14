@@ -12,14 +12,14 @@ os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_F
 t_lowp = 15 * 60 - 20
 t_highp = 6 * 60 - 20
 t_ramp = 40
-low_p = 0.48
-high_p = 0.9
+low_p = 0.47
+high_p = 0.8
 bess_size = 200
 p_nom = 410
 poi = [1, t_lowp, t_lowp + t_ramp, t_lowp + t_ramp + t_highp - 1]
 
-regr_type = 'RF'
-method = 'opt'
+regr_type = 'paper2'
+method = 'media'
 
 ramp_carico = simple_ramp(low_p, high_p, t_lowp, t_highp, t_ramp)
 ramp_carico = add_eta(ramp_carico, regr_type)

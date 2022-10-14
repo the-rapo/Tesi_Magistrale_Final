@@ -500,6 +500,8 @@ def add_eta(data, model_in):
         model_path = 'models/multivariate/Poly/deg4'
     elif model_in == 'mono_mod':
         model_path = 'models/univariate/Poly/deg4_low'
+    elif model_in == 'mono2_mod':
+        model_path = 'models/univariate/Poly/deg4_low_2'
     elif model_in == 'paper':
         model_path = 'models/univariate/Poly/paper'
     elif model_in == 'paper2':
@@ -507,11 +509,12 @@ def add_eta(data, model_in):
     else:
         sys.exit("Errore")
 
-    if model_in == ('RF' or 'ALL' or 'MLP' or 'SVR'):
+    if model_in == 'RF' or model_in == 'ALL' or model_in == 'MLP' or model_in == 'SVR':
         model, _ = Load_ML_Model(model_path)
         x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
         eta = model.predict(x)
-    elif model_in == 'mono' or model_in == 'mono_mod' or model_in == 'paper' or model_in == 'paper2' or model_in == 'mono2':
+    elif model_in == 'mono' or model_in == 'mono_mod' or model_in == 'paper' or model_in == 'paper2' \
+            or model_in == 'mono2' or model_in == 'mono2_mod':
         model, transformer = Load_Poly_model(model_path)
         x = data['PwrTOT_rel'].values.reshape(-1, 1)
         eta = model.predict(transformer.transform(x))
@@ -519,11 +522,12 @@ def add_eta(data, model_in):
         model, transformer = Load_Poly_model(model_path)
         x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
         eta = model.predict(transformer.transform(x))
-        if model_in == 'mono_mod':
-            eta = np.array(eta)
-            eta = eta + 0.04
     else:
         sys.exit("Errore")
+
+    if model_in == 'mono_mod' or model_in == 'mono2_mod':
+        eta = np.array(eta)
+        eta = eta + 0.03
 
     data['Rendimento'] = eta
     data['Pwr_in'] = np.divide(data['PwrTOT'], data['Rendimento'])
@@ -531,7 +535,7 @@ def add_eta(data, model_in):
     return data
 
 
-def plot_coatto(data_bess, data_nobess, delta_eta=None, BESS_size=None):
+def plot_coatto(data_bess, data_nobess, delta_eta=None, BESS_size=None, save=None):
     import matplotlib.pyplot as plt
     import numpy as np
     from cust_libs.misc import transf_fun, SOC_MWh
@@ -588,9 +592,11 @@ def plot_coatto(data_bess, data_nobess, delta_eta=None, BESS_size=None):
                       color='k', ha='center', fontsize=18)
     ax[1][0].legend(loc="best")
     # fig.subplots_adjust(top=0.93)
-    plt.show()
 
-
+    if save is not None:
+        plt.savefig(save, bbox_inches='tight', dpi=300)
+    else:
+        plt.show()
 def media(data):
     import numpy as np
     #

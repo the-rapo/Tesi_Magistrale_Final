@@ -3,11 +3,13 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+import matplotlib as mpl
 # Custom LIBs
 
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 
 data_path_ON = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
+# mpl.rcParams["font.size"] = 18
 
 # - DATI
 low_eta = 0.5
@@ -51,7 +53,7 @@ ax0.xaxis.set_ticks(np.arange(0.46, 0.54, 0.005))
 locs_y = ax0.get_yticks()
 locs_x = ax0.get_xticks()
 ax0.set_yticks(locs_y, np.round(locs_y / len(rendimento) * 100, 1))
-ax0.set_ylabel('Percentuale [%]')
+ax0.set_ylabel('Frequenza percentuale [%]')
 if censura:
     ax0.set_xticks(locs_x, np.round(locs_x * 100 / rend_max, 1))
     ax0.set_xlabel('Rendimento Rel. [%]')

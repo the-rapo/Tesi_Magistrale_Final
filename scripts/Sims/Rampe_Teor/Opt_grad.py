@@ -6,6 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
+censura = True
+rend_max = 0.545
 
 model, _ = Load_ML_Model('models/multivariate/ML/RND_FOR/RND_FOR_02.joblib')
 # model, _ = Load_ML_Model('models/multivariate/ML/ALL/ALL_02.joblib')
@@ -180,9 +182,14 @@ fig, ax = plt.subplots(figsize=(18, 9))
 
 ax.plot(grad_i, rend_i, linewidth=2, label='Rendimento complesivo')
 ax.plot(grad_i, rend_i_rampa, linewidth=2, label='Rendimento del transitorio')
-locs_y = ax.get_yticks()
-ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
-ax.set_ylabel('Rendimento [%]')
+if censura:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+    ax.set_ylabel('Rendimento Rel. [%]')
+else:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax.set_ylabel('Rendimento [%]')
 ax.set_xlabel(r'$\nabla P$ [MW/min]')
 plt.legend(loc='best')
 plt.savefig('IO/Opt_Grad_Boost_Confronto', bbox_inches='tight')
@@ -195,9 +202,14 @@ ax.plot(ramp_BESS_opt['Rendimento'], label='BESS Ottimizzato', linewidth=2)
 ax.plot(ramp_BESS_non_opt['Rendimento'], label='BESS non Ottimizzato', linewidth=2)
 ax.plot(ramp_carico['Rendimento'], label='Carico', linewidth=2)
 ax.axvline(x=120, color='k', linestyle=(0, (5, 10)), linewidth=2, label='Segnale Variazione Carico')
-locs_y = ax.get_yticks()
-ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
-ax.set_ylabel('Rendimento [%]')
+if censura:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+    ax.set_ylabel('Rendimento Rel. [%]')
+else:
+    locs_y = ax.get_yticks()
+    ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+    ax.set_ylabel('Rendimento [%]')
 ax.set_xlabel('Tempo [min]')
 
 plt.legend(loc='best')

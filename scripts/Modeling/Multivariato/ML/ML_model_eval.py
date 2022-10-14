@@ -8,8 +8,8 @@ import sys
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 
 
-Model_type = 'RF'
-save_dir = 'temp'
+Model_type = 'SVR'
+save_dir = 'IO'
 acc = 'data/processed/Corsini2021/acc/Corsini2021_Acc01.csv'
 data_full = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
 

@@ -189,7 +189,7 @@ def RMSE_MAE_plot(model, data_full, parameters=None, x_transform=None, title=Non
 
 
 def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None, scatter=True, save=None,
-               Single_Param=False):
+               Single_Param=False, censura=True):
     """
     Esegue il plot del modello specificato
 
@@ -214,7 +214,7 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
     data = pd.read_csv('Data/Processed/Corsini2021/Corsini2021_Processed_ON.csv')
     alpha = 0.1
     mpl.rcParams["font.size"] = 18
-
+    rend_max = 0.545
     fig, ax = plt.subplots(figsize=(18, 9))
     if scatter:
         gradh = filter_data(data, 0.02, None, None, None)  # 8.2 MW / min
@@ -223,18 +223,18 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
         gradml = filter_data(data, -0.02, -0.005, None, None)
         gradl = filter_data(data, None, -0.02, None, None)
         gradh.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  >  8.5$ MW/min ',
-                                         marker='o', color='r', ax=ax, alpha=alpha)
+                                         marker='o', color='tab:red', ax=ax, alpha=alpha)
         gradmh.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento',
-                                          label=r'$ \nabla  P  \in $ [ 2.0;  8.5 ]  MW/min ',
-                                          marker='o', color='m', ax=ax, alpha=alpha)
+                                          label=r'$ \nabla  P  \in $ [ 2.0;  8.5 ]  MW/min',
+                                          marker='o', color='tab:orange', ax=ax, alpha=alpha)
         grad0.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento',
-                                         label=r'$ \nabla  P  \in $ [-2.0;  2.0 ]  MW/min ',
-                                         marker='o', color='k', ax=ax, alpha=alpha)
+                                         label=r'$ \nabla  P  \in $ [-2.0;  2.0 ]  MW/min',
+                                         marker='o', color='tab:green', ax=ax, alpha=alpha)
         gradml.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento',
-                                          label=r'$ \nabla  P  \in $ [-8.5; -2.0 ]  MW/min ',
-                                          marker='o', color='c', ax=ax, alpha=alpha)
+                                          label=r'$ \nabla  P  \in $ [-8.5; -2.0 ]  MW/min',
+                                          marker='o', color='tab:cyan', ax=ax, alpha=alpha)
         gradl.reset_index().plot.scatter(x='PwrTOT_rel', y='Rendimento', label=r'$ \nabla  P  <  8.5$ MW/min ',
-                                         marker='o', color='b', ax=ax, alpha=alpha)
+                                         marker='o', color='tab:blue', ax=ax, alpha=alpha)
 
     if Single_Param:
         x_1 = np.linspace(0.1, 0.9, n, endpoint=True).reshape(-1, 1)
@@ -273,6 +273,15 @@ def Model_Plot(model, modelname=None, n=1000, parameters=None, x_transform=None,
     ax.set_xlabel(r'$P_{rel}$')
     secax1_x = ax.secondary_xaxis('top', functions=(rel2tot, tot2rel))
     secax1_x.set_xlabel(r'$P\ [MW]$')
+    if censura:
+        ax.yaxis.set_ticks(np.linspace(0, rend_max, 6, endpoint=True))
+        locs_y = ax.get_yticks()
+        ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+        ax.set_ylabel('Rendimento Rel. [%]')
+    else:
+        locs_y = ax.get_yticks()
+        ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+        ax.set_ylabel('Rendimento [%]')
     if modelname is not None:
         plt.title(modelname)
     plt.legend(loc='best')
@@ -321,7 +330,8 @@ def Model_Plot_3D(model, modelname=None, n=1000, parameters=None, x_transform=No
     plt.show()
 
 
-def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False):
+def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False,
+              censura=True):
     """
     Esegue un grafico che confronta i dati storici con quelli predetti dal modello
 
@@ -338,7 +348,9 @@ def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameter
     # LIBs
     import matplotlib.pyplot as plt
     import matplotlib as mpl
+    import numpy as np
     #
+    rend_max = 0.545
     if len(x_test) == len(y_test):
         if parameters is None:
             if x_transform is not None:
@@ -347,12 +359,20 @@ def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameter
         else:
             y_pred = model(x_test, *parameters).reshape(-1, 1)
         mpl.rcParams["font.size"] = 18
-        plt.figure(figsize=(18, 9))
-        plt.plot(y_test, color="cornflowerblue", label="Data", linewidth=2)
-        plt.plot(y_pred, color="yellowgreen", label="Prediction", linewidth=2)
-        plt.ylim([0.46, 0.53])
+        fig, ax = plt.subplots(figsize=(18, 9))
+        ax.plot(y_test, color="cornflowerblue", label="Data", linewidth=2)
+        ax.plot(y_pred, color="yellowgreen", label="Prediction", linewidth=2)
+        ax.set_ylim([0.46, 0.53])
         plt.xlabel('Tempo[min]')
-        plt.ylabel('Rendimento')
+        if censura:
+            ax.yaxis.set_ticks(np.linspace(0.45, rend_max, 6, endpoint=True))
+            locs_y = ax.get_yticks()
+            ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+            ax.set_ylabel('Rendimento Rel. [%]')
+        else:
+            locs_y = ax.get_yticks()
+            ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+            ax.set_ylabel('Rendimento [%]')
         if modelname is not None:
             plt.title(modelname)
         plt.legend()
@@ -365,7 +385,8 @@ def Pred_Plot(model, x_test, y_test, x_transform=None, modelname=None, parameter
     return
 
 
-def Delibr_Plot(model, data, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False):
+def Delibr_Plot(model, data, x_transform=None, modelname=None, parameters=None, save=None, Single_Param=False,
+                censura=True):
     """
     Esegue un grafico che confronta i dati storici con quelli predetti dal modello
 
@@ -380,8 +401,13 @@ def Delibr_Plot(model, data, x_transform=None, modelname=None, parameters=None, 
     # LIBs
     import matplotlib.pyplot as plt
     import matplotlib as mpl
+    import numpy as np
     #
-    x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
+    rend_max = 0.545
+    if Single_Param:
+        x = data['PwrTOT_rel'].values.reshape(-1, 1)
+    else:
+        x = data[['PwrTOT_rel', 'Grad_PwrTOT_rel']].values
     y_true = data['Rendimento'].values.reshape(-1, 1)
     if parameters is None:
         if x_transform is not None:
@@ -390,17 +416,30 @@ def Delibr_Plot(model, data, x_transform=None, modelname=None, parameters=None, 
     else:
         y_pred = model(x, *parameters).reshape(-1, 1)
     mpl.rcParams["font.size"] = 18
-    plt.figure(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(10, 10))
 
     plt.scatter(y_true, y_pred, c='crimson')
 
     p1 = max(max(y_true), max(y_pred))
     p2 = min(min(y_true), min(y_pred))
-    plt.plot([p1, p2], [p1, p2], 'b-')
-    plt.xlabel('True Values', fontsize=15)
-    plt.ylabel('Predictions', fontsize=15)
-    plt.axis('equal')
-    plt.show()
+    ax.plot([p1, p2], [p1, p2], 'b-')
+
+    if censura:
+        locs_y = ax.get_yticks()
+        ax.set_yticks(locs_y, np.round(locs_y * 100 / rend_max, 1))
+        ax.set_ylabel('Predictions - Rendimento Rel. [%]')
+        locs_x = ax.get_xticks()
+        ax.set_xticks(locs_x, np.round(locs_x * 100 / rend_max, 1))
+        ax.set_xlabel('True Values - Rendimento Rel. [%]')
+    else:
+        locs_y = ax.get_yticks()
+        ax.set_yticks(locs_y, np.round(locs_y * 100, 1))
+        ax.set_ylabel('Predictions - Rendimento [%]')
+        locs_x = ax.get_xticks()
+        ax.set_xticks(locs_x, np.round(locs_x * 100, 1))
+        ax.set_xlabel('True Values - Rendimento Rel. [%]')
+
+    ax.axis('equal')
     if modelname is not None:
         plt.title(modelname)
     plt.legend()

@@ -8,6 +8,7 @@ import matplotlib as mpl
 from cust_libs.data_processing import filter_data
 from cust_libs.misc import transf_fun
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
+# mpl.rcParams["font.size"] = 18
 
 data_path_ON = 'data/processed/Corsini2021/Corsini2021_Processed_ON.csv'
 
@@ -50,7 +51,7 @@ locs_y = ax0.get_yticks()
 locs_x = ax0.get_xticks()
 ax0.set_yticks(locs_y, np.round(locs_y / len(rel_pwr) * 100, 1))
 ax0.set_xticks(locs_x, np.round(locs_x * 100, 1))
-ax0.set_ylabel('Percentuale [%]')
+ax0.set_ylabel('Frequenza percentuale [%]')
 ax0.set_xlabel('Potenza Relativa [%]')
 
 ax0.axvline(x=low_P, color='black', linestyle='dashed', linewidth=1, alpha=0.5)

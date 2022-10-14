@@ -23,7 +23,7 @@ poi = [
     [2800, 3200, 3250, 4000]
     ]
 
-regr_type = 'mono'
+regr_type = 'mono2'
 
 ramp_carico = pd.read_csv('data/processed/Corsini2021/acc/Corsini2021_Acc01.csv')
 

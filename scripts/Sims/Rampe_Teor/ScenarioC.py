@@ -18,7 +18,7 @@ high_p1 = 0.80
 t_highp1 = 4 * 60 - 10
 low_p2 = 0.47
 t_lowp2 = 5 * 60 - 10
-high_p2 = 0.80
+high_p2 = 0.8
 t_highp2 = 5 * 60 - 10
 
 
@@ -36,8 +36,8 @@ poi2 = [t_first_cicle , t_first_cicle + t_lowp2, t_first_cicle + t_lowp2 + t_ram
 poi = [poi1, poi2]
 bess_size =200
 
-regr_type = 'mono2'
-method = 'opt'
+regr_type = 'paper2'
+method = 'media'
 
 
 low_p_list1 = np.linspace(low_p1, low_p1, t_lowp1, endpoint=True)

@@ -8,6 +8,7 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import numpy as np
+
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 
 t_lowp = 2 * 60
@@ -20,19 +21,17 @@ LP_tresh = 0.64
 HP_tresh = 0.72
 
 bess_size = 200
-acc_no = 1
-method = 'auto'
-regr_type = 'mono2_mod'
-acc_path = 'data/processed/Corsini2021/acc/Corsini2021_Acc' + str(acc_no).zfill(2) + '.csv'
+regr_type = 'mono2'
 out_fold = 'IO/sim_acc'
-str(acc_no).zfill(2)
-savepath = out_fold + '/' + 'MmBF-' + str(acc_no).zfill(2) + '_' + regr_type + '.png'
 
-
-acc = pd.read_csv(acc_path)
-acc_corr = add_eta(acc, regr_type)
-eta_std = compute(acc_corr, 'avg_eta')
-if method == 'auto':
+for i in range(55):
+    acc_no = i + 1
+    str(acc_no).zfill(2)
+    savepath = out_fold + '/' + 'MmBF-' + str(acc_no).zfill(2) + '_' + regr_type + '.png'
+    acc_path = 'data/processed/Corsini2021/acc/Corsini2021_Acc' + str(acc_no).zfill(2) + '.csv'
+    acc = pd.read_csv(acc_path)
+    acc_corr = add_eta(acc, regr_type)
+    eta_std = compute(acc_corr, 'avg_eta')
     rendimento_max = 0
     winner_LP = 0
     winner_HP = 0
@@ -46,19 +45,8 @@ if method == 'auto':
                 winner_LP = i
                 winner_HP = j
 
-    print('Migliori parametri')
-    print('L_op' + str(winner_LP))
-    print('H_op' + str(winner_HP))
-
     ramp_BESS = simple_sim(winner_LP, winner_HP, bess_size, acc_corr)
     ramp_BESS = add_eta(ramp_BESS, regr_type)
     eta = compute(ramp_BESS, 'avg_eta')
     plot_coatto(ramp_BESS, acc_corr, eta - eta_std, save=savepath)
-
-if method == 'manual':
-    ramp_BESS = simple_sim(LP_tresh, HP_tresh, bess_size, acc_corr)
-    ramp_BESS = add_eta(ramp_BESS, regr_type)
-    eta = compute(ramp_BESS, 'avg_eta')
-    plot_coatto(ramp_BESS, acc_corr, eta - eta_std)
-
-# 1 - 0.55 | 0.79
+    print(str(acc_no).zfill(2) + ' / ' + str(55))

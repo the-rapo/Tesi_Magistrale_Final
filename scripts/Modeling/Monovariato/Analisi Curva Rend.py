@@ -12,11 +12,11 @@ from cust_libs.misc import transf_fun
 #
 os.chdir(r'C:\Users\rapon\Documents\UNI\Tesi Magistrale\Python\Tesi_Magistrale_Final')
 #
-model_fld = 'models/univariate/Poly/deg4_low_2'
+model_fld = 'models/univariate/Poly/paper2'
 poly_modelname = 'Paper'
 data = pd.read_csv('data/processed/Corsini2021/Corsini2021_Processed_ON.csv')
 save_path = 'IO/'
-censura = True
+censura = False
 rend_max = 0.545
 #
 mpl.rcParams["font.size"] = 18
@@ -30,9 +30,15 @@ y_rend_grad = np.gradient(y_rend)
 nabla_eta45_6 = float(Predict_Point_Poly(model, poly, 0.6) - Predict_Point_Poly(model, poly, 0.45))
 nabla_eta6_7 = float(Predict_Point_Poly(model, poly, 0.7) - Predict_Point_Poly(model, poly, 0.6))
 nabla_eta7_9 = float(Predict_Point_Poly(model, poly, 0.9) - Predict_Point_Poly(model, poly, 0.7))
-text_napla1 = r' $\Delta$ $\eta$ = ' "{:.4f}".format(nabla_eta45_6)
-text_napla2 = r' $\Delta$ $\eta$ = ' "{:.4f}".format(nabla_eta6_7)
-text_napla3 = r' $\Delta$ $\eta$ = ' "{:.4f}".format(nabla_eta7_9)
+
+if censura:
+    nabla_eta45_6 = nabla_eta45_6 / rend_max
+    nabla_eta6_7 = nabla_eta6_7 / rend_max
+    nabla_eta7_9 = nabla_eta7_9 / rend_max
+
+text_napla1 = r' $\Delta$ $\eta$ = ' "{:.1f}".format(nabla_eta45_6 * 100) + '%'
+text_napla2 = r' $\Delta$ $\eta$ = ' "{:.1f}".format(nabla_eta6_7 * 100) + '%'
+text_napla3 = r' $\Delta$ $\eta$ = ' "{:.1f}".format(nabla_eta7_9 * 100) + '%'
 
 # PLOT
 '''
